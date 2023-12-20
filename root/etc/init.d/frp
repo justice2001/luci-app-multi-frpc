@@ -10,7 +10,7 @@ LOGFILE="/var/etc/frp"
 
 echo_date(){
 	local log=$1
-	echo $(date +%Y/%m/%d\ %X): "$log" >> $LOGFILE
+	echo $(date +%Y/%m/%d\ %X): "$log" >> "$LOGFILE/frp.log"
 }
 
 Reduce_Log(){
