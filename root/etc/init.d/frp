@@ -292,7 +292,3 @@ stop() {
 	fi
 	return 0
 }
-
-test() {
-	
-}
