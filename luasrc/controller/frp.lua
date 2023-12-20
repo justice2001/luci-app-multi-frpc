@@ -10,7 +10,7 @@ function index()
 	entry({"admin", "services", "frp"}, alias("admin", "services", "frp", "base"), _("Multi Frpc"), 100).dependent = true
 	entry({"admin", "services", "frp", "base"}, cbi("frp/basic"), _("Frp Setting"), 1).leaf = true
 	entry({"admin", "services", "frp", "service_log"}, cbi("frp/log"), _("Plugin Log"), 2).leaf = true
-	entry({"admin", "services", "frp", "client_log"}, cbi("frp/client_log"), _("Clent Log"), 3).leaf = true
+	entry({"admin", "services", "frp", "client_log"}, cbi("frp/client_log"), _("Client Log"), 3).leaf = true
 	entry({"admin", "services", "frp", "config"}, cbi("frp/config")).leaf = true
 	entry({"admin", "services", "frp", "server"}, cbi("frp/server")).leaf = true
 	entry({"admin", "services", "frp", "status"}, call("act_status")).leaf = true
