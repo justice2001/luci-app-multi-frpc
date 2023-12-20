@@ -141,7 +141,7 @@ config_server_add() {
 	local servicecfg="$3"
 	local server_addr server_port token user server_name
 
-	config_get server_name "$config" name
+	config_get server_name "$cfg" name
 	config_get server_addr "$cfg" server_addr
 	config_get server_port "$cfg" server_port
 	config_get token "$cfg" token
@@ -165,9 +165,9 @@ frp_write_bool() {
 
 	config_get_bool val $config "$opt" "$def"
 	if [ "$val" -eq 0 ]; then
-		echo "${opt}=false" >> $tmpconf
+		echo "${opt}=false" >> $service_conf
 	else
-		echo "${opt}=true" >> $tmpconf
+		echo "${opt}=true" >> $service_conf
 	fi
 }
 
@@ -206,7 +206,6 @@ boot() {
 }
 
 start() {
-
 	config_load "frp"
 	local enabled server_addr server_port time privilege_token user tcp_mux enable_cpool tls_enable
 	local pool_count log_level log_max_days login_fail_exit http_proxy protocol admin_port admin_user admin_pwd
