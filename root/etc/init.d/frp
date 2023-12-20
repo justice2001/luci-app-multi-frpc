@@ -279,14 +279,16 @@ start() {
 }
 
 start_service() {
-	local config="$2"
+	local config="$1"
 	local server_name
 
 	config_get server_name "$config" name
 
+    [ $servername != "" ] || return 1
+
 	logger -t FRPC "Starting frp service $server_name"
 	SERVICE_DAEMONIZE=1 \
-		service_start /usr/bin/frpc -c "$1/frpc-$server_name.conf"
+		service_start /usr/bin/frpc -c "$2/frpc-$server_name.conf"
 }
 
 stop() {
