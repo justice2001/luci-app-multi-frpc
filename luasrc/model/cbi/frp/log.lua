@@ -10,7 +10,7 @@ t.rows=26
 t.readonly="readonly"
 t.wrap = "off"
 t.cfgvalue = function(t,t)
-return s.readfile("/var/etc/frp/frp.log")or""
+return fs.readfile("/var/etc/frp/frp.log")or""
 end
 t.write = function(e,e,e)
 end
