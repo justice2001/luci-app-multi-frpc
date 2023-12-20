@@ -269,8 +269,8 @@ start() {
 	# 检查服务
 
 	[ "$(cat "$service_conf" | grep -c "type=")" -gt 0 ] || (echo_date "frp服务启动失败，请首先添加服务列表！" && exit 0)
-	SERVICE_DAEMONIZE=1 \
-		config_foreach start_service server "$tmpconf"
+
+	config_foreach start_service server "$tmpconf"
 
 	[ "$time" -gt 0 ] && frp_add_cru $time
 	[ -z "$(pgrep /usr/bin/frpc)" ] && echo_date "frp服务启动失败，请检查服务端 “TCP多路复用(tcp_mux)”设置，确保与客户端完全一致！"
@@ -285,8 +285,8 @@ start_service() {
 	config_get server_name "$config" name
 
 	logger -t FRPC "Starting frp service $server_name"
-
-	service_start /usr/bin/frpc -c "$1/frpc-$server_name.conf"
+	SERVICE_DAEMONIZE=1 \
+		service_start /usr/bin/frpc -c "$1/frpc-$server_name.conf"
 }
 
 stop() {
