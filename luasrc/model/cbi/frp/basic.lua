@@ -148,7 +148,7 @@ e.rows = 26
 e.wrap = "off"
 e.readonly = true
 e.cfgvalue = function(t,t)
-return s.readfile("/var/etc/frp/frpc.log")or""
+return s.readfile("/var/etc/frp/frp.log")or""
 end
 e.write = function(e,e,e)
 end

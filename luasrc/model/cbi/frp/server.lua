@@ -7,7 +7,7 @@ local a, t, e
 arg[1] = arg[1]or""
 
 a = Map("frp")
-a.title = translate("Frp Domain Config")
+a.title = translate("Frp Server Config")
 a.redirect = i.build_url("admin", "services", "frp")
 
 t = a:section(NamedSection, arg[1], "frp")
