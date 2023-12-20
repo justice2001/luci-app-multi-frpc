@@ -23,6 +23,11 @@ e.rmempty = false
 e:value("1", translate("Enable"))
 e:value("0", translate("Disable"))
 
+
+e = t:taboption("base", Value, "name", translate("Server Name"))
+e.optional = false
+e.rmempty = false
+
 e = t:taboption("base", Value, "server_addr", translate("Server"))
 e.optional = false
 e.rmempty = false
