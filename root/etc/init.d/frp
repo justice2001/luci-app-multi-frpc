@@ -240,7 +240,8 @@ start() {
 	[ ! -f "$LOGFILE" ] && touch $LOGFILE
 	
 	[ ! -f "/usr/bin/frpc" ] && download_binary
-	[ ! -f "/usr/bin/frpc" ] && logger -t Frp 'Download frpc failed, please retry.' && exit 0
+	[ ! -f "/usr/bin/frpc" ] && logger -t Frp 'Download frpc failed, please retry.'
+	[ ! -f "/usr/bin/frpc" ] && echo_date "Frp客户端下载失败, 请重试!" && exit 0
 	
 	local tmpconf="/var/etc/frp"
 	local service_conf="/var/etc/frp/service.conf"
@@ -287,6 +288,8 @@ start_service() {
     [ "$server_name" != "" ] || return 1
 
 	logger -t FRPC "Starting frp service $server_name"
+	echo_date "正在启动Frp客户端: $server_name"
+
 	SERVICE_DAEMONIZE=1 \
 		"/usr/bin/frpc" -c "$2/frpc-$server_name.conf" &
 }
@@ -294,11 +297,13 @@ start_service() {
 stop() {
 	frp_del_cru
 	[ "$(pidof frpc)" != "" ] || return 1
-	echo_date "frpc shutting down service!"
+
+	logger -t FRPC 'Shutting down frp service'
+	echo_date "停止所有Frp客户端!"
+
 	kill $(pidof frpc)
 
 	# if [ -n "`pidof frpc`" ]; then
-	# 	logger -t FRPC 'Shutting down frp service'
 	# 	service_stop /usr/bin/frpc
 	# 	# Reduce_Log $LOGFILE
 	# fi
