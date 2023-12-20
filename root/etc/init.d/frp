@@ -284,7 +284,7 @@ start_service() {
 
 	config_get server_name "$config" name
 
-    [ $servername != "" ] || return 1
+    [ "$server_name" != "" ] || return 1
 
 	logger -t FRPC "Starting frp service $server_name"
 	SERVICE_DAEMONIZE=1 \
