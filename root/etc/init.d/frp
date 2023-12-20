@@ -142,6 +142,9 @@ config_server_add() {
 	local server_addr server_port token user server_name
 
 	config_get server_name "$cfg" name
+
+	if [ $server_name = "" ] || return 1
+
 	config_get server_addr "$cfg" server_addr
 	config_get server_port "$cfg" server_port
 	config_get token "$cfg" token
@@ -155,6 +158,9 @@ config_server_add() {
 	echo "token=${token}" >>$tmpconf
 	[ -n "$user" ] && echo "user=$user" >>$tmpconf
 	echo "log_file=$LOGFILE/frpc-$server_name.log" >>$tmpconf
+
+	# Append service to config file
+	cat "$servicecfg" >> $tmpconf
 }
 
 frp_write_bool() {
@@ -240,7 +246,7 @@ start() {
 	local service_conf="/var/etc/frp/service.conf"
 
 	# Load Service Config
-	echo "log_level=${log_level}" >>$service_conf
+	echo "log_level=${log_level}" > $service_conf
 	echo "log_max_days=${log_max_days}" >>$service_conf
 	echo "protocol=${protocol}" >>$service_conf
 	[ -n "$http_proxy" ] && echo "http_proxy=$http_proxy" >>$service_conf
@@ -263,7 +269,6 @@ start() {
 	# 检查服务
 
 	[ "$(cat "$service_conf" | grep -c "type=")" -gt 0 ] || (echo_date "frp服务启动失败，请首先添加服务列表！" && exit 0)
-	logger -t FRPC 'Starting frp service'
 	SERVICE_DAEMONIZE=1 \
 		config_foreach start_service server "$tmpconf"
 
@@ -279,7 +284,9 @@ start_service() {
 
 	config_get server_name "$config" name
 
-	service_start /usr/bin/frpc -c "$config/frpc-$server_name.conf"
+	logger -t FRPC "Starting frp service $server_name"
+
+	service_start /usr/bin/frpc -c "$1/frpc-$server_name.conf"
 }
 
 stop() {
