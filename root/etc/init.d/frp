@@ -288,7 +288,7 @@ start_service() {
 
 	logger -t FRPC "Starting frp service $server_name"
 	SERVICE_DAEMONIZE=1 \
-		service_start /usr/bin/frpc -c "$2/frpc-$server_name.conf"
+		"/usr/bin/frpc" -c "$2/frpc-$server_name.conf" &
 }
 
 stop() {
