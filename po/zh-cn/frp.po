@@ -321,3 +321,27 @@ msgstr "插件 Host Header 重写"
 
 msgid "plugin_header_X-From-Where"
 msgstr "插件X-From-Where请求头"
+
+msgid "Multi Frpc"
+msgstr "Frpc内网穿透"
+
+msgid "Server List"
+msgstr "服务器列表"
+
+msgid "Server Remark Name"
+msgstr "服务器备注“
+
+msgid "Server User"
+msgstr "登陆用户"
+
+msgid "Plugin Log"
+msgstr "插件日志"
+
+msgid "Client Log"
+msgstr "客户端日志"
+
+msgid "Choose a server"
+msgstr "选择一个配置"
+
+msgid "Reload"
+msgstr "刷新"

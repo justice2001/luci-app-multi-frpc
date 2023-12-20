@@ -18,7 +18,6 @@ t.addremove = false
 
 t:tab("base", translate("Basic Settings"))
 t:tab("other", translate("Other Settings"))
-t:tab("log", translate("Kernal Log"))
 
 e = t:taboption("base", Flag, "enabled", translate("Enabled"))
 e.rmempty = false
@@ -141,17 +140,6 @@ e.default = "admin"
 e.password = true
 e:depends("admin_enable", 1)
 
--- LOG
-
-e = t:taboption("log", TextValue, "log")
-e.rows = 26
-e.wrap = "off"
-e.readonly = true
-e.cfgvalue = function(t,t)
-return s.readfile("/var/etc/frp/frpc.log")or""
-end
-e.write = function(e,e,e)
-end
 
 -- Server List
 
@@ -173,16 +161,19 @@ function t.remove(e,t)
 end
 
 e = t:option(DummyValue, "name", translate("Server Remark Name"))
-e.width = "10%"
 
 e = t:option(DummyValue, "server_addr", translate("Server Address"))
-e.width = "10%"
+e.width = "30%"
 
 e = t:option(DummyValue, "server_port", translate("Server Port"))
-e.width = "10%"
+e.width = "15%"
 
 e = t:option(DummyValue, "user", translate("Server User"))
+e.width = "15%"
+
+e = t:option(Flag, "enable", translate("Enable State"))
 e.width = "10%"
+e.rmempty = false
 
 -- Service Lists
 

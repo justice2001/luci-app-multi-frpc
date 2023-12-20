@@ -1,0 +1,43 @@
+<form>
+    <div style="padding: 20px 20px 5px;">
+        <label for="server-list"><%:Choose a server%>: 
+            <select name="server" id="server-list"></select>
+        </label>
+        <input class="cbi-button cbi-button-apply" type="button" id="reload" value="<%:Reload%>" />
+    </div>
+    <div style="padding: 5px 20px 20px;">
+        <textarea readonly id="content" style="width: 100%; min-height: 800px!important;"></textarea>
+    </div>
+</form>
+
+<script>
+    var tb = document.getElementById('server-list');
+    let current = ""
+    tb.addEventListener("change", e => {
+        const vl = e.currentTarget.value
+        current = vl
+        startRecieveLog(vl)
+    })
+    document.getElementById("reload").addEventListener("click", () => {
+        startRecieveLog(current)
+    })
+    XHR.get('<%=url([[admin]], [[services]], [[frp]], [[server_list]])%>', null, function(x, data) {
+        const dt = Array.from(data)
+        dt.forEach(node => {
+            tb.innerHTML += `<option value="${node}">${node}</option>`
+        })
+        if (dt.length > 0) {
+            tb.value = dt[0]
+            current = dt[0]
+            startRecieveLog(dt[0])
+        }
+    })
+    function startRecieveLog(log) {
+        XHR.get('<%=url([[admin]], [[services]], [[frp]], [[get_log]])%>', {name: log},
+            function(x, data) {
+                var tb = document.getElementById('content');
+                tb.value = x.responseText
+            }
+        );
+    }
+</script>
