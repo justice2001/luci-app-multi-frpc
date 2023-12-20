@@ -6,7 +6,7 @@ START=99
 SERVICE_WRITE_PID=1
 SERVICE_DAEMONIZE=1
 
-LOGFILE="/var/etc/frp/frpc.log"
+LOGFILE="/var/etc/frp"
 
 echo_date(){
 	local log=$1
@@ -136,6 +136,27 @@ conf_proxy_add() {
 
 }
 
+config_server_add() {
+	local cfg="$1"
+	local servicecfg="$3"
+	local server_addr server_port token user server_name
+
+	config_get server_name "$config" name
+	config_get server_addr "$cfg" server_addr
+	config_get server_port "$cfg" server_port
+	config_get token "$cfg" token
+	config_get user "$cfg" user
+
+	local tmpconf="$2/frpc-$server_name.conf"
+
+	echo "[common]" >$tmpconf
+	echo "server_addr=${server_addr}" >>$tmpconf
+	echo "server_port=${server_port}" >>$tmpconf
+	echo "token=${token}" >>$tmpconf
+	[ -n "$user" ] && echo "user=$user" >>$tmpconf
+	echo "log_file=$LOGFILE/frpc-$server_name.log" >>$tmpconf
+}
+
 frp_write_bool() {
 	local opt="$1"
 	local config="$2"
@@ -195,10 +216,6 @@ start() {
 
 	[ "$enabled" -gt 0 ] || return 1
 
-	config_get server_addr common server_addr
-	config_get server_port common server_port
-	config_get token common token
-	config_get user common user
 	config_get enable_cpool common enable_cpool
 	config_get pool_count common pool_count
 	config_get log_level common log_level
@@ -220,41 +237,50 @@ start() {
 	[ ! -f "/usr/bin/frpc" ] && download_binary
 	[ ! -f "/usr/bin/frpc" ] && logger -t Frp 'Download frpc failed, please retry.' && exit 0
 	
-	local tmpconf="/var/etc/frp/frpc.conf"
+	local tmpconf="/var/etc/frp"
+	local service_conf="/var/etc/frp/service.conf"
 
-	echo "[common]" >$tmpconf
-	echo "server_addr=${server_addr}" >>$tmpconf
-	echo "server_port=${server_port}" >>$tmpconf
-	echo "token=${token}" >>$tmpconf
-	[ -n "$user" ] && echo "user=$user" >>$tmpconf
-	echo "log_level=${log_level}" >>$tmpconf
-	echo "log_max_days=${log_max_days}" >>$tmpconf
-	echo "protocol=${protocol}" >>$tmpconf
-	echo "log_file=$LOGFILE" >>$tmpconf
-	[ -n "$http_proxy" ] && echo "http_proxy=$http_proxy" >>$tmpconf
-	[ -n "$pool_count" ] && echo "pool_count=$pool_count" >>$tmpconf
-	[ -n "$admin_port" ] && echo "admin_addr=0.0.0.0" >>$tmpconf && echo "admin_port=$admin_port" >>$tmpconf
-	[ -n "$admin_user" ] && echo "admin_user=$admin_user" >>$tmpconf
-	[ -n "$admin_pwd" ] && echo "admin_pwd=$admin_pwd" >>$tmpconf
-	[[ -n "$tls_cert_file" && -n "$tls_key_file" ]] && echo "tls_cert_file=$tls_cert_file" >>$tmpconf && echo "tls_key_file=$tls_key_file" >>$tmpconf
-	[ -n "$tls_trusted_ca_file" ] && echo "tls_trusted_ca_file=$tls_trusted_ca_file" >>$tmpconf
-
+	# Load Service Config
+	echo "log_level=${log_level}" >>$service_conf
+	echo "log_max_days=${log_max_days}" >>$service_conf
+	echo "protocol=${protocol}" >>$service_conf
+	[ -n "$http_proxy" ] && echo "http_proxy=$http_proxy" >>$service_conf
+	[ -n "$pool_count" ] && echo "pool_count=$pool_count" >>$service_conf
+	[ -n "$admin_port" ] && echo "admin_addr=0.0.0.0" >>$service_conf && echo "admin_port=$admin_port" >>$service_conf
+	[ -n "$admin_user" ] && echo "admin_user=$admin_user" >>$service_conf
+	[ -n "$admin_pwd" ] && echo "admin_pwd=$admin_pwd" >>$service_conf
+	[[ -n "$tls_cert_file" && -n "$tls_key_file" ]] && echo "tls_cert_file=$tls_cert_file" >>$service_conf && echo "tls_key_file=$tls_key_file" >>$service_conf
+	[ -n "$tls_trusted_ca_file" ] && echo "tls_trusted_ca_file=$tls_trusted_ca_file" >>$service_conf
 
 	config_load "frp"
 	frp_write_bool tcp_mux common 1
 	frp_write_bool tls_enable common 0
 	frp_write_bool login_fail_exit common 1
-	config_foreach conf_proxy_add proxy "$tmpconf"
 
-	[ "$(cat "$tmpconf" | grep -c "type=")" -gt 0 ] || (echo_date "frp服务启动失败，请首先添加服务列表！" && exit 0)
+	# Write Service Config
+	config_foreach conf_proxy_add proxy "$service_conf"
+	config_foreach config_server_add server "$tmpconf" "$service_conf"
+
+	# 检查服务
+
+	[ "$(cat "$service_conf" | grep -c "type=")" -gt 0 ] || (echo_date "frp服务启动失败，请首先添加服务列表！" && exit 0)
 	logger -t FRPC 'Starting frp service'
 	SERVICE_DAEMONIZE=1 \
-		service_start /usr/bin/frpc -c $tmpconf
+		config_foreach start_service server "$tmpconf"
 
 	[ "$time" -gt 0 ] && frp_add_cru $time
 	[ -z "$(pgrep /usr/bin/frpc)" ] && echo_date "frp服务启动失败，请检查服务端 “TCP多路复用(tcp_mux)”设置，确保与客户端完全一致！"
 
 	return 0
+}
+
+start_service() {
+	local config="$2"
+	local server_name
+
+	config_get server_name "$config" name
+
+	service_start /usr/bin/frpc -c "$config/frpc-$server_name.conf"
 }
 
 stop() {
@@ -265,4 +291,8 @@ stop() {
 		Reduce_Log $LOGFILE
 	fi
 	return 0
+}
+
+test() {
+	
 }

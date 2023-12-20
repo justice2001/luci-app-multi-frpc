@@ -23,27 +23,6 @@ t:tab("log", translate("Client Log"))
 e = t:taboption("base", Flag, "enabled", translate("Enabled"))
 e.rmempty = false
 
-e = t:taboption("base", Value, "server_addr", translate("Server"))
-e.optional = false
-e.rmempty = false
-
-e = t:taboption("base", Value, "server_port", translate("Port"))
-e.datatype = "port"
-e.optional = false
-e.rmempty = false
-
-e = t:taboption("base", Value, "token", translate("Token"))
-e.description = translate("Time duration between server of frpc and frps mustn't exceed 15 minutes.")
-e.optional = false
-e.password = true
-e.rmempty = false
-
-e = t:taboption("base", Value, "user", translate("User"))
-e.description = translate("Commonly used to distinguish you with other clients.")
-e.optional = true
-e.default = ""
-e.rmempty = false
-
 e = t:taboption("base", Value, "vhost_http_port", translate("Vhost HTTP Port"))
 e.datatype = "port"
 e.rmempty = false
@@ -57,6 +36,8 @@ e.description = translate("0 means disable this feature, unit: min")
 e.datatype = "range(0,59)"
 e.default = 30
 e.rmempty = false
+
+-- Other
 
 e = t:taboption("other", Flag, "login_fail_exit", translate("Exit program when first login failed"))
 e.description = translate("decide if exit program when first login failed, otherwise continuous relogin to frps.")
@@ -160,15 +141,50 @@ e.default = "admin"
 e.password = true
 e:depends("admin_enable", 1)
 
+-- LOG
+
 e = t:taboption("log", TextValue, "log")
 e.rows = 26
 e.wrap = "off"
 e.readonly = true
 e.cfgvalue = function(t,t)
-return s.readfile("/var/etc/frp/frpc.log")or""
+return s.readfile("/var/etc/frp/frpc-Default.log")or""
 end
 e.write = function(e,e,e)
 end
+
+-- Server List
+
+t = a:section(TypedSection, "server", translate("Server List"))
+t.anonymous = true
+t.addremove = true
+t.template = "cbi/tblsection"
+t.extedit = o.build_url("admin", "services", "frp", "server", "%s")
+
+function t.create(e,t)
+    new = TypedSection.create(e,t)
+    luci.http.redirect(e.extedit:format(new))
+end
+
+function t.remove(e,t)
+    e.map.proceed = true
+    e.map:del(t)
+    luci.http.redirect(o.build_url("admin","services","frp"))
+end
+
+e = t:option(DummyValue, "name", translate("Server Remark Name"))
+e.width = "10%"
+
+e = t:option(DummyValue, "server_addr", translate("Server Address"))
+e.width = "10%"
+
+e = t:option(DummyValue, "server_port", translate("Server Port"))
+e.width = "10%"
+
+e = t:option(DummyValue, "user", translate("Server User"))
+e.width = "10%"
+
+-- Service Lists
 
 t = a:section(TypedSection, "proxy", translate("Services List"))
 t.anonymous = true
@@ -208,8 +224,6 @@ if t=="both_dtype" then
 local b = a.uci:get(i,n,"custom_domains")or""
 local c = a.uci:get(i,n,"subdomain")or""
 b="%s/%s"%{b,c} return b end
-if m=="tcp" or m=="udp" then
-local b = a.uci:get(i,"common","server_addr")or"" return b end
 end
 
 e = t:option(DummyValue, "remote_port", translate("Remote Port"))
