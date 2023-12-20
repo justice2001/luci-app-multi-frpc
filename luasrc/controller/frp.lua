@@ -5,7 +5,9 @@ function index()
 		return
 	end
 
-	entry({"admin", "services", "frp"}, cbi("frp/basic"), _("Frp Setting"), 100).dependent = true
+	entry({"admin", "services", "frp"}, alias("services", "services", "frp", "base"), _("Multi Frpc"), 100).dependent = true
+	entry({"admin", "services", "frp", "base"}, cbi("frp/basic"), _("Frp Setting"), 1).leaf = true
+	entry({"admin", "services", "frp", "log"}, cbi("frp/basic"), _("Plugin Log"), 2).leaf = true
 	entry({"admin", "services", "frp", "config"}, cbi("frp/config")).leaf = true
 	entry({"admin", "services", "frp", "server"}, cbi("frp/server")).leaf = true
 	entry({"admin", "services", "frp", "status"}, call("act_status")).leaf = true
