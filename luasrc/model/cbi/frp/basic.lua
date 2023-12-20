@@ -161,16 +161,19 @@ function t.remove(e,t)
 end
 
 e = t:option(DummyValue, "name", translate("Server Remark Name"))
-e.width = "10%"
 
 e = t:option(DummyValue, "server_addr", translate("Server Address"))
-e.width = "10%"
+e.width = "30%"
 
 e = t:option(DummyValue, "server_port", translate("Server Port"))
-e.width = "10%"
+e.width = "15%"
 
 e = t:option(DummyValue, "user", translate("Server User"))
+e.width = "15%"
+
+e = t:option(Flag, "enable", translate("Enable State"))
 e.width = "10%"
+e.rmempty = false
 
 -- Service Lists
 
