@@ -18,7 +18,7 @@ t.addremove = false
 
 t:tab("base", translate("Basic Settings"))
 t:tab("other", translate("Other Settings"))
-t:tab("log", translate("Client Log"))
+t:tab("log", translate("Kernal Log"))
 
 e = t:taboption("base", Flag, "enabled", translate("Enabled"))
 e.rmempty = false
@@ -148,7 +148,7 @@ e.rows = 26
 e.wrap = "off"
 e.readonly = true
 e.cfgvalue = function(t,t)
-return s.readfile("/var/etc/frp/frpc-Default.log")or""
+return s.readfile("/var/etc/frp/frpc.log")or""
 end
 e.write = function(e,e,e)
 end
