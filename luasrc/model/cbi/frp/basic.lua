@@ -171,7 +171,7 @@ e.width = "15%"
 e = t:option(DummyValue, "user", translate("Server User"))
 e.width = "15%"
 
-e = t:option(Flag, "enable", translate("Enable State"))
+e = t:option(Flag, "enabled", translate("Enable State"))
 e.width = "10%"
 e.rmempty = false
 

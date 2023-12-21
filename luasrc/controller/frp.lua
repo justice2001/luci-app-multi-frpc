@@ -28,8 +28,9 @@ end
 
 function get_server()
 	local ret = {}
-	uci.foreach("frp", "server", function (s) 
-		ret[#ret + 1] = s["name"]
+	uci:load("frp")
+	uci:foreach("frp", "server", function (s)
+		table.insert(ret, s["name"])
 	end)
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(ret) 
