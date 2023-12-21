@@ -139,12 +139,18 @@ conf_proxy_add() {
 config_server_add() {
 	local cfg="$1"
 	local servicecfg="$3"
-	local server_addr server_port token user server_name
+	local server_addr server_port token user server_name enabled
 
 	config_get server_name "$cfg" name
+	config_get_bool enabled "$cfg" enabled 0
 
 	[ $server_name != "" ] || return 1
+	if [ "$enabled" -lt 1 ]; then
+		echo_date "服务端 $server_name 被禁用"
+		return 1
+	fi
 
+	echo_date "正在创建 $server_name 的配置文件"
 	config_get server_addr "$cfg" server_addr
 	config_get server_port "$cfg" server_port
 	config_get token "$cfg" token
@@ -246,6 +252,9 @@ start() {
 	local tmpconf="/var/etc/frp"
 	local service_conf="/var/etc/frp/service.conf"
 
+	# Clean File
+	rm $tmpconf/*.conf
+
 	# Load Service Config
 	echo "log_level=${log_level}" > $service_conf
 	echo "log_max_days=${log_max_days}" >>$service_conf
@@ -269,6 +278,8 @@ start() {
 
 	# 检查服务
 
+	[ "$(find $tmpconf -name "frpc-*.conf")" != "" ] || (echo_date "frp服务启动失败，没有配置可用服务端" && exit 0)
+
 	[ "$(cat "$service_conf" | grep -c "type=")" -gt 0 ] || (echo_date "frp服务启动失败，请首先添加服务列表！" && exit 0)
 
 	config_foreach start_service server "$tmpconf"
@@ -286,6 +297,7 @@ start_service() {
 	config_get server_name "$config" name
 
     [ "$server_name" != "" ] || return 1
+	[ -f "$2/frpc-$server_name.conf" ] || return 1
 
 	logger -t FRPC "Starting frp service $server_name"
 	echo_date "正在启动Frp客户端: $server_name"
@@ -302,10 +314,5 @@ stop() {
 	echo_date "停止所有Frp客户端!"
 
 	kill $(pidof frpc)
-
-	# if [ -n "`pidof frpc`" ]; then
-	# 	service_stop /usr/bin/frpc
-	# 	# Reduce_Log $LOGFILE
-	# fi
 	return 0
 }
