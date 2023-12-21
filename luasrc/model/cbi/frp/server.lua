@@ -17,7 +17,7 @@ t.dynamic = false
 
 t:tab("base", translate("Basic Settings"))
 
-e = t:taboption("base", ListValue, "enable", translate("Enable State"))
+e = t:taboption("base", ListValue, "enabled", translate("Enable State"))
 e.default = "1"
 e.rmempty = false
 e:value("1", translate("Enable"))
