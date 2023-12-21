@@ -1,6 +1,6 @@
 
 config frp 'common'
-	option enable '0'
+	option enabled '0'
 	option log_max_days '3'
 	option login_fail_exit '0'
 	option enable_cpool '0'
