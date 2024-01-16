@@ -329,7 +329,7 @@ msgid "Server List"
 msgstr "服务器列表"
 
 msgid "Server Remark Name"
-msgstr "服务器备注“
+msgstr "服务器备注"
 
 msgid "Server User"
 msgstr "登陆用户"
