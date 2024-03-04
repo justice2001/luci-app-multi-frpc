@@ -345,3 +345,19 @@ msgstr "选择一个配置"
 
 msgid "Reload"
 msgstr "刷新"
+
+msgid "Frp Server Config"
+msgstr "服务器配置"
+
+msgid "Config Server"
+msgstr "配置服务器"
+
+msgid "Server Name"
+msgstr "服务器名"
+
+msgid "Server Address"
+msgstr "服务器地址"
+
+msgid "Server Port"
+msgstr "服务器端口"
+
